@@ -1,3 +1,4 @@
+
 /***************************************************************/
 /* This file is a member of the pentago game server written by */
 /*                                                             */
@@ -14,19 +15,51 @@
 /*                                                             */
 /***************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <string.h>
+
+#include "pentago_client.h"
+
+void pent_errc(char*func, char*msg){
+  char buf[128];
+  sprintf(buf, "error [%s]: %s\n", func, msg);
+  perror(buf);
+  exit(1);
+}
 
 
-#define DEFAULT_PORT 9000
-#define DEFAULT_BUF_LEN 512
+int run_client(int port){
 
-typedef struct sockaddr_in sockaddr_in;
+  int sock;
+  sockaddr_in serv_addr;
+  struct hostent *server;
+  char*func = strdup("run_client");
+  char buf[DEFAULT_BUF_LEN];
+  int inloop = 1;
 
-int run_client(int port);
+  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    pent_errc(func, (char*)"unable to open socket");
+
+  if (!(server = gethostbyname("localhost")))
+    pent_errc(func, (char*)"host does not exist");
+
+  serv_addr.sin_family = AF_INET;
+  bcopy((char *)server->h_addr, 
+	(char *)&serv_addr.sin_addr.s_addr,
+	server->h_length);
+  serv_addr.sin_port = htons(port);
+
+  if (connect(sock,(sockaddr*)&serv_addr,sizeof(sockaddr)) < 0) 
+    pent_errc(func, (char*)"could not connect to server");
+
+  while (inloop){
+    printf("pentago> ");
+    fgets(buf,255,stdin);
+    write(sock,buf,strlen(buf));
+    read(sock,buf,255);
+    printf("%s\n",buf);
+
+  }
+
+
+  return 0;
+
+}

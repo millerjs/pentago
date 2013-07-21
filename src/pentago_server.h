@@ -14,17 +14,25 @@
 /*                                                             */
 /***************************************************************/
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <string.h>
+#include <pthread.h>
 
 #define DEFAULT_PORT 9000
+#define DEFAULT_BUF_LEN 512
 
 typedef struct sockaddr_in sockaddr_in;
 
-int run_server();
+typedef struct thread_args{
+  int socket; 
+  char*cmd;
+  
+} thread_args; 
+
+int run_server(int port);
 int create_socket();

@@ -15,18 +15,45 @@
 /***************************************************************/
 
 #include <stdio.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <string.h>
+
+#include "pentago_server.h"
+#include "pentago_client.h"
 
 
-#define DEFAULT_PORT 9000
-#define DEFAULT_BUF_LEN 512
+int main(int argc, char *argv[]){
+  
+  int server;
+  int port = DEFAULT_PORT;
+  int c;
+  
+  opterr = 0;
+  while ((c = getopt (argc, argv, "sp:")) != -1){
+    switch (c){
+    case 's':
+      server = 1;
+      break;
+    case 'p':
+      port = atoi(optarg);
+      break;
+    default:
+      fprintf(stderr, "undefined argument\n");
+      exit(1);
+    }
+  }
 
-typedef struct sockaddr_in sockaddr_in;
+  if (server){
+    run_server(port);
 
-int run_client(int port);
+  } else {
+    run_client(port);
+
+  }
+
+
+  return 0; 
+}
