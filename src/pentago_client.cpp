@@ -20,9 +20,10 @@
 
 void pent_errc(char*func, char*msg){
   char buf[128];
-  sprintf(buf, "error [%s]: %s\n", func, msg);
+  sprintf(buf, "error [%s]: %s", func, msg);
   perror(buf);
   exit(1);
+
 }
 
 
